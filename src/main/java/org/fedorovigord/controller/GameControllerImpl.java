@@ -115,6 +115,5 @@ public class GameControllerImpl implements GameController {
         var scannerRunScheduler = scheduler
                 .scheduleAtFixedRate(scannerRun, 0, gameSpeed.get() - 10, TimeUnit.MILLISECONDS);
 
-
     }
 }

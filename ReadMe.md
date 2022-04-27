@@ -1,4 +1,4 @@
-Camel Java Router Project
+Simple console snake
 =========================
 
 === How to build
@@ -15,4 +15,4 @@ You can run this example using
 
 === More information
 
-You can find more information about Apache Camel at the website: http://camel.apache.org/
+to change directions you need to enter 'WASD' in the console
