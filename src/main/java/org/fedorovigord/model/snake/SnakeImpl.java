@@ -47,6 +47,8 @@ public class SnakeImpl implements Snake {
         var nextHead = direction.
                 moveHead(points, linesTotal -1, columnsTotal - 1);
 
+        nextHead.setType(PointType.SNAKE_HEAD);
+        points.peekFirst().setType(PointType.SNAKE);
 
         if (! (nextHead.getLine() == (foodPoint.getLine())
             && (nextHead.getColumn() == (foodPoint.getColumn()))))

@@ -8,20 +8,22 @@ import org.fedorovigord.model.snake.*;
 import org.fedorovigord.view.SnakeConsoleView;
 import org.fedorovigord.view.SnakeView;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.Scanner;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class GameControllerImpl implements GameController {
 
     private Field field;
     private Snake snake;
-    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(3);
+    private final ScheduledExecutorService scheduler = new ScheduledThreadPoolExecutor(4);
     private SnakeView view;
+
+    private Integer snakeSize;
+    AtomicLong gameSpeed = new AtomicLong(1000);
 
     private final Up up = new Up();
     private final Down down = new Down();
@@ -59,6 +61,16 @@ public class GameControllerImpl implements GameController {
     }
 
 
+    private boolean isSnakeGrow() {
+        var currantSize = snake.getCurrantPoints().size();
+        if (snakeSize == currantSize)
+            return false;
+
+        snakeSize = currantSize;
+
+        return true;
+    }
+
 
     @Override
     public void start() {
@@ -78,8 +90,9 @@ public class GameControllerImpl implements GameController {
             view.printFullField(field.getCurrantField());
         };
 
+
         ScheduledFuture<?> gameSchedule = scheduler.
-                scheduleAtFixedRate(moveSnake, 0, 800, TimeUnit.MILLISECONDS);
+                scheduleAtFixedRate(moveSnake, 0, gameSpeed.get(), TimeUnit.MILLISECONDS);
 
         Runnable cancelGame = () -> {
             if (isGameOver()){
@@ -89,7 +102,8 @@ public class GameControllerImpl implements GameController {
             }
         };
 
-        scheduler.scheduleAtFixedRate(cancelGame, 400, 400, TimeUnit.MILLISECONDS);
+        var cancelGameScheduler = scheduler
+                .scheduleAtFixedRate(cancelGame, 0, gameSpeed.get() >> 1, TimeUnit.MILLISECONDS);
 
         Scanner sc = new Scanner(System.in);
 
@@ -98,6 +112,9 @@ public class GameControllerImpl implements GameController {
             setMoveDirection(inp);
         };
 
-        scheduler.scheduleAtFixedRate(scannerRun, 0, 500, TimeUnit.MILLISECONDS);
+        var scannerRunScheduler = scheduler
+                .scheduleAtFixedRate(scannerRun, 0, gameSpeed.get() - 10, TimeUnit.MILLISECONDS);
+
+
     }
 }
